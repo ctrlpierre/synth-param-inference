@@ -1,0 +1,12 @@
+name: synth_project
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - portaudio
+  - numpy
+  - pandas
+  - pip
+  - pip:
+    - pyo

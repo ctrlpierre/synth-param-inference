@@ -1,0 +1,15 @@
+# Ignorer les données générées (Audio et CSV)
+wavs/
+logs/
+*.csv
+
+# Ignorer les dossiers de cache Python
+__pycache__/
+*.pyc
+
+# Ignorer les environnements virtuels
+env/
+venv/
+.idea/
+.vscode/
+.DS_Store
