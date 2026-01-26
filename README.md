@@ -2,9 +2,8 @@
 
 ![Python](https://img.shields.io/badge/Python-3.10-blue.svg?style=flat&logo=python)
 ![Domain](https://img.shields.io/badge/Domain-Audio_DSP_&_DL-purple.svg)
-![Libs](https://img.shields.io/badge/Libs-Pyo-orange.svg)
-![Status](https://img.shields.io/badge/Status-Dataset_Ready-green.svg?style=flat)
-
+![Libs](https://img.shields.io/badge/Libs-Pyo,_Pytorch-orange.svg)
+![Status](https://img.shields.io/badge/Status-Model_Evaluation-yellow.svg?style=flat)
 
 ## Description du Projet
 
@@ -20,11 +19,11 @@ En l'état, le projet se décompose en trois phases critiques :
 
 - [x] **Data Generation** : Création d'un dataset massif de couples `(Audio, Paramètres)` via un moteur DSP programmable.
 - [x] **Data Validation** : Mise en place de règles heuristiques pour garantir la cohérence physique des sons (éviter les silences ou les filtrages destructeurs).
-- [ ] **Deep Learning** : Entraînement d'une architecture neuronale multi-tâches :
-    * **Classification Head :** Pour les variables discrètes (Formes d'ondes, Types de filtres).
-    * **Regression Head :** Pour les variables continues (Fréquences, ADSR, Q, Mix).
+- [x] **Classification Discrète** : Entraînement d'un CNN pour identifier le type d'oscillateur et de filtre.
+- [ ] **Régression Continue** : Prédiction précise des fréquences, résonances et enveloppes ADSR.
+- [ ] **Multi-Oscillation** : Passage à une architecture complexe (Somme d'oscillateurs, FM, etc.).
 
-## Architecture du Dataset
+## Architecture du système
 
 La base de données actuelle est constituée de **10 000 échantillons** générés procéduralement.
 
@@ -32,7 +31,7 @@ La base de données actuelle est constituée de **10 000 échantillons** génér
 * **Librairie :** `Pyo`
 * **Synthétiseur :** Architecture soustractive simpliste (Oscillateur + Noise -> Filtre Biquad -> Enveloppe ADSR).
 
-### Stratégie de Génération
+### Stratégie de Génération du Dataset
 Pour éviter les biais d'apprentissage classiques, le script de génération (`pyo_tests.ipynb`) implémente des logiques avancées :
 * **Sanity Checks :** Algorithmes vérifiant la relation entre la fréquence fondamentale et le `cutoff` du filtre.
     * *Exemple :* On fait en sorte que si un son généré avec un filtre Passe-Bas (LP), alors ce dernier doit être réglé plus bas que la fréquence de la note (on évite les fichiers silencieux).
@@ -40,6 +39,11 @@ Pour éviter les biais d'apprentissage classiques, le script de génération (`p
     * Fréquences générées sur une échelle logarithmique (perception humaine).
     * Variation des types de filtres (LowPass, HighPass, BandPass simple).
     * Gestion aléatoire mais contrôlée du bruit et de la résonance.
+
+### Pre-processing Audio
+Pour que le CNN puisse interpréter le signal, l'audio brut est transformé en représentation temps-fréquence :
+* **Spectrogramme de Mel** : Conversion de l'audio 44.1kHz en image 2D.
+* **Normalisation** : Ajustement de l'amplitude pour une convergence plus rapide du modèle.
 
 ## Structure des Données
 
@@ -57,6 +61,19 @@ Chaque entrée du dataset est composée de :
     * `filter_res` (float)
     * `env_attack`, `env_decay`, `env_sustain`, `env_release` (float : sec)
     * `master_vol` (float  : 0 à 1)
+
+## Résultats Actuels (Évaluation)
+
+Les premiers tests de classification montrent une forte capacité du modèle à distinguer les timbres fondamentaux.
+
+### Matrice de Confusion : Oscillateurs
+Le modèle distingue parfaitement les formes d'ondes (Sine, Saw, Square, Triangle). Une légère confusion peut apparaître entre le Pulse et la Square ainsi que la Saw Up et Saw Down. Cette dernière confusion était prévisible
+
+### Matrice de Confusion : Filtres
+Identification des types **LowPass**, **HighPass** et **BandPass**. La précision est élevée, car chaque filtre sculpte le spectre de manière unique.
+
+> **Note :** Les visualisations de ces matrices sont générées via `ConfusionMatrixDisplay` dans le notebook de test.
+
 
 ## Installation de l'environement
 

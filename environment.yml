@@ -8,5 +8,15 @@ dependencies:
   - numpy
   - pandas
   - pip
+  - matplotlib
+  - ipykernel
+  - scikit-learn
+  - libsndfile
+  - ffmpeg
   - pip:
     - pyo
+    - torch
+    - torchaudio
+    - torchvision
+    - torchsummary
+    - torchcodec
